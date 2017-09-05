@@ -6,6 +6,7 @@ public class segement{
 	static int n;
 	static long in[];
 	static long seg[];
+        static long lazy[];
 	static int size;
 	public static void main(String[]args) {
 		s = new Scanner(System.in);
@@ -19,17 +20,22 @@ public class segement{
 		build(0,0,n-1);
                 long result = search(0,0,n-1,0,2);
                 System.out.println(result);
+                change(0,0,n-1,0,2,25);
+                result = search(0,0,n-1,0,2);
+                System.out.println(result);
 
 	}
-
-	static void size() {
+        
+        static void size() {
 		double d1 = Math.log(n);
 		d1 = Math.ceil(d1);
 		d1+=(1.0);
 		int pow = (int)(d1);
 		double d2 = Math.pow(2,pow);
-		size = (int)(d2);
-		seg = new long[size];	
+		size = (int)(d2)+1;
+		seg = new long[size];
+                lazy = new long[size];
+               System.out.println(size+" : this is size");
 	}
 
 	static void build(int index , int low ,int high) {
@@ -62,9 +68,11 @@ public class segement{
             }
             
             if(low == high) {
-                seg[index] = value;
+                seg[index] += value;
                 return;
             }
+            
+            shift(index,low,high);  //this is lazy loading
             
             int mid = low+(high-low)/2;
             int indexOne = 2*index+1;
@@ -75,7 +83,27 @@ public class segement{
             return;
             
         }
-
+        
+        static void lazyUpdate(int index , int intervalStart , int intervalEnd , long value) {
+            if(intervalStart > intervalEnd) {
+                return;
+            }
+            lazy[index] = value;
+            seg[index]+=((intervalEnd-intervalStart+1)*value);
+            return;
+        }
+        
+        static void shift(int index , int intervalStart,int intervalEnd) {
+            if(intervalStart > intervalEnd) {
+                return;
+            }
+            int mid = intervalStart + (intervalEnd - intervalStart)/2;
+            lazyUpdate(2*index+1 , intervalStart , mid,lazy[index]);
+            lazyUpdate(2*index+2,mid+1,intervalEnd,lazy[index]);
+            lazy[index] = 0;
+            return;
+        }
+        
 	static long search(int index , int low,int high, int intervalStart,int intervalEnd) {
 
 		if(low>high) {
@@ -85,7 +113,9 @@ public class segement{
 		if(high < intervalStart || low >intervalEnd) {
 			return 0;
 		}
-
+                
+                shift(index ,low,high);   // this is laoding lazy loads.
+                
 		if(low>=intervalStart && high <=intervalEnd) {
 			return seg[index];
 		}
