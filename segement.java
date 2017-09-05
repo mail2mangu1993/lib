@@ -22,7 +22,7 @@ public class segement{
                 System.out.println(result);
                 change(0,0,n-1,0,2,25);
                 result = search(0,0,n-1,0,2);
-                System.out.println(result);
+                System.out.println(result+" after change");
 
 	}
         
@@ -34,8 +34,7 @@ public class segement{
 		double d2 = Math.pow(2,pow);
 		size = (int)(d2)+1;
 		seg = new long[size];
-                lazy = new long[size];
-               System.out.println(size+" : this is size");
+                lazy = new long[size];       
 	}
 
 	static void build(int index , int low ,int high) {
@@ -88,8 +87,13 @@ public class segement{
             if(intervalStart > intervalEnd) {
                 return;
             }
-            lazy[index] = value;
-            seg[index]+=((intervalEnd-intervalStart+1)*value);
+            
+            try{
+                lazy[index] = value;
+                seg[index]+=((intervalEnd-intervalStart+1)*value);
+            } catch(Exception e) {
+                System.out.println("Error : start :"+intervalStart+" End: "+ intervalEnd+" index : "+ index);
+            }
             return;
         }
         
@@ -114,6 +118,7 @@ public class segement{
 			return 0;
 		}
                 
+                if(low<high)
                 shift(index ,low,high);   // this is laoding lazy loads.
                 
 		if(low>=intervalStart && high <=intervalEnd) {
